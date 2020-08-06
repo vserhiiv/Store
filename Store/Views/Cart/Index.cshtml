@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Store.Models.ViewModels.Cart.CartVM>
+
+@{
+    ViewBag.Title = "Cart Details";
+}
+
+<h2>Cart Details</h2>
+
+@if (ViewBag.Message != null)
+{
+    <h3>@ViewBag.Message</h3>
+}
+else
+{
+    <table class="table">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Quantuty
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Image
+            </th>
+
+            <th>
+                <!--Свободная ячейка для кнопок количества товаров-->
+            </th>
+
+            <th>
+                Total
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td class="qty@(item.ProductId)">
+                    @Html.DisplayFor(modelItem => item.Quantuty)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)&#36;
+                </td>
+                <td>
+                    <img src="/Images/Uploads/Products/@item.ProductId/Thumbs/@item.Image" />
+                </td>
+                <td>
+                    <a href="#" class="incproduct" data-id="@item.ProductId">+</a>
+                    <a href="#" class="decproduct" data-id="@item.ProductId">-</a>
+                    <a href="#" class="removeproduct" data-id="@item.ProductId">Remove</a>
+                </td>
+                <td class="total@(item.ProductId)">
+                    @Html.DisplayFor(modelItem => item.Total)&#36;
+                </td>
+            </tr>
+        }
+
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="grandtotal"><b>Grand Total: </b><span>@ViewBag.GrandTotal</span>&#36;</td>
+        </tr>
+
+    </table>
+}
+
+@section Scripts
+{
+
+    <script src="~/Content/ShopJS/IncrementProductScript.js"></script>
+}
