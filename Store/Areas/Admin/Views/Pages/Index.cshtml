@@ -49,7 +49,7 @@
             <td>
                 @Html.ActionLink("Edit", "EditPage", new { id = item.Id }) |
                 @Html.ActionLink("Details", "PageDetails", new { id = item.Id })
-                <!--Если Slug равен home, не показывать кнопку удаления-->
+                <!--If Slug is home, do not show delete button-->
                 @if (item.Slug != "home")
                 {
                     string slash = "| ";

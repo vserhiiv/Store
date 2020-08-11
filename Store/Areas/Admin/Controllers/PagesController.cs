@@ -10,51 +10,45 @@ namespace Store.Areas.Admin.Controllers
 {
     public class PagesController : Controller
     {
+        [Authorize(Roles = "Admin")]
         // GET: Admin/Pages
         public ActionResult Index()
-        {
-            //Объявляум список для представления (PageVM)
+        {            
             List<PageVM> pageList;
 
-            //Инициализируем список (Db)
+            // Initializing the list (Db)
             using (Db db = new Db())
             {
                 pageList = db.Pages.ToArray().OrderBy(x => x.Sorting).Select(x => new PageVM(x)).ToList();
             }
 
-            //Возвращаем список в представление
             return View(pageList);
         }
 
-        // GET: Admin/Pages/AddPage
         [HttpGet]
         public ActionResult AddPage()
         {
             return View();
         }
 
-        // Post: Admin/Pages/AddPage
         [HttpPost]
         public ActionResult AddPage(PageVM model)
         {
-            //Проверка модели на валидность
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
             using (Db db = new Db())
             {
-
-                //Объявляем переменную для краткого описания (slug)
+                // Declaring a variable for short description (slug)
                 string slug;
 
-                //Инициализируем класс PageDTO
                 PagesDTO dto = new PagesDTO();
 
-                //Присваиваем заголовок модели
+                // Assigning a title to the model
                 dto.Title = model.Title.ToUpper();
 
-                //Проверяем, есть ли краткое описание, если нет, присваиваем
+                // Check: if there is a short description, if not - assign
                 if (string.IsNullOrWhiteSpace(model.Slug))
                 {
                     slug = model.Title.Replace(" ", "-").ToLower();
@@ -64,7 +58,7 @@ namespace Store.Areas.Admin.Controllers
                     slug = model.Slug.Replace(" ", "-").ToLower();
                 }
 
-                //Убеждаемся, что заголовок и краткое описание - уникальны
+                // Make sure the title and short description are unique
                 if (db.Pages.Any(x => x.Title == model.Title))
                 {
                     ModelState.AddModelError("", "That title already exist.");
@@ -76,80 +70,72 @@ namespace Store.Areas.Admin.Controllers
                     return View(model);
                 }
 
-                //Присваиваем оставшиеся значения модели
+                // Assigning the Remaining Values to the Model
                 dto.Slug = slug;
                 dto.Body = model.Body;
                 dto.HasSidebar = model.HasSidebar;
                 dto.Sorting = 100;
 
-                //Сохраняем модель в базу данных
+                // Save the model to the database
                 db.Pages.Add(dto);
                 db.SaveChanges();
 
             }
 
-            //Передаем сообщение об успешности операции через TempData
+            // send a message about the success of the operation via TempData
             TempData["SM"] = "You have added a new page!";
 
-            //Переадрессовываем пользователя на метод INDEX
             return RedirectToAction("Index");
         }
 
-        // GET: Admin/Pages/EditPage/id
         [HttpGet]
         public ActionResult EditPage(int id)
         {
-            //Объявляем пмодель PageVM
             PageVM model;
 
             using (Db db = new Db())
             {
-                //Получаем страницу
+                // Get the page
                 PagesDTO dto = db.Pages.Find(id);
 
-                //Проверяем, доступна ли страница
+                // Checking if the page is available
                 if (dto == null)
                 {
                     return Content("The page does not exist.");
                 }
 
-                //Инициализируем модель данными
+                // Initializing the model with data
                 model = new PageVM(dto);
 
             }
 
-            //Возвращаем модель в представление
-
             return View(model);
         }
 
-        // POST: Admin/Pages/EditPage/id
         [HttpPost]
         public ActionResult EditPage(PageVM model)
         {
-            //Проверяем модель на валидность
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-
             using (Db db = new Db())
             {
-                //Получаем ID Страницы
+                // Get the Page ID
                 int id = model.Id;
 
-                //Объявляем переменную краткого заголовка
+                // Declaring a short title variable
                 string slug = "home";
 
-                //Получаем страницу по ID
+                // Get the page by ID
                 PagesDTO dto = db.Pages.Find(id);
 
-                //Присваиваем название из полученной модели в DTO
+                // Assigning a name from the resulting model to the DTO
                 dto.Title = model.Title;
 
-                //Проверяем краткий заголовок и присваиваем его, если это необходимо
-                if(model.Slug != "home")
+                // Checking the short title and assigning it if necessary
+                if (model.Slug != "home")
                 {
                     if (string.IsNullOrWhiteSpace(model.Slug))
                     {
@@ -161,8 +147,8 @@ namespace Store.Areas.Admin.Controllers
                     }
                 }
 
-                //Проверяем Title и Slug на уникальность
-                if(db.Pages.Where(x => x.Id != id).Any(x => x.Title == model.Title))
+                // Checking Title and Slug for uniqueness
+                if (db.Pages.Where(x => x.Id != id).Any(x => x.Title == model.Title))
                 {
                     ModelState.AddModelError("", "That title already exist.");
                     return View(model);
@@ -173,24 +159,20 @@ namespace Store.Areas.Admin.Controllers
                     return View(model);
                 }
 
-                //Записываем остальные значения в класс DTO
+                // Writing the rest of the values to the DTO class
                 dto.Slug = slug;
                 dto.Body = model.Body;
                 dto.HasSidebar = model.HasSidebar;
 
-                //Сохраняем изменения в базу
                 db.SaveChanges();
 
             }
-            //Устанавливаем сообщение в TempData
+            // SM - successful message
             TempData["SM"] = "You have edited the page.";
-
-            //Переадресация пользователя
 
             return RedirectToAction("EditPage");
         }
 
-        // GET: Admin/Pages/PageDetails/id
         public ActionResult PageDetails(int id)
         {
             //Объявляем модель PageVM
@@ -215,18 +197,14 @@ namespace Store.Areas.Admin.Controllers
             return View(model);
         }
 
-        // GET: Admin/Pages/DeletePage/id
         public ActionResult DeletePage(int id)
         {
             using (Db db = new Db())
             {
-                //Получаем страницу
                 PagesDTO dto = db.Pages.Find(id);
 
-                //Удаляем страницу
                 db.Pages.Remove(dto);
 
-                //Созраняем изменения в базе
                 db.SaveChanges();
 
             }
@@ -238,19 +216,18 @@ namespace Store.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        // POST: Admin/Pages/ReorderPages
         [HttpPost]
         public void ReorderPages(int[] id)
         {
             using (Db db = new Db())
             {
-                //Реализуем начальный счетчик
+                // Implementing the initial counter
                 int count = 1;
 
-                //Инициализируем модель данных
+                // Initializing the data model
                 PagesDTO dto;
 
-                //Установить сортировку для каждой страницы
+                // Set sorting for each page
                 foreach (var pageId in id)
                 {
                     dto = db.Pages.Find(pageId);
@@ -264,46 +241,40 @@ namespace Store.Areas.Admin.Controllers
             }
         }
 
-        // GET: Admin/Pages/EditSidebar/id
         [HttpGet]
         public ActionResult EditSidebar()
         {
-            //Объявляем модель
             SidebarVM model;
 
             using (Db db = new Db())
             {
-                //Получаем данные из DTO
-                SidebarDTO dto = db.Sidebars.Find(1); //Гавнокод! Задание параметра "жестко" - для теста
+                // Getting data from DTO
+                SidebarDTO dto = db.Sidebars.Find(1); //hardcode
 
-                //Заполняем модель данными
+                // Filling the model with data
                 model = new SidebarVM(dto);
 
             }
-            //Вернуть представление с моделью
 
             return View(model);
         }
 
-        // POST: Admin/Pages/EditSidebar
         [HttpPost]
         public ActionResult EditSidebar(SidebarVM model)
         {
             using (Db db = new Db())
             {
-                //Получаем данные из DTO
-                SidebarDTO dto = db.Sidebars.Find(1); //Гавнокод!
+                // Getting data from DTO
+                // SidebarDTO dto = db.Sidebars.Find(1); //Test
+                SidebarDTO dto = db.Sidebars.FirstOrDefault(x => x.Id == model.Id);
 
-                //Присваиваем данные в тело (в свойство body)
                 dto.Body = model.Body;
 
-                //Сохраняем
                 db.SaveChanges();
             }
 
-            //Присваиваем сообщение в TempData
             TempData["SM"] = "You have edited the sidebar!";
-            //Переадресовываем пользователя
+
             return RedirectToAction("EditSidebar");
         }
     }

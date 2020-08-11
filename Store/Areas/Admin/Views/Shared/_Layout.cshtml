@@ -33,7 +33,7 @@
             <!--New right menu-->
             <ul class="navbar-nav ml-auto">
                 <li>
-                    <a href="#" class="navbar-brand" target="_blank">Shopping Cart</a>
+                    @Html.ActionLink("Shopping Cart", "Products", "Shop", "", new { @class = "navbar-brand", target = "_blank" })
                 </li>
             </ul>
 
@@ -52,7 +52,7 @@
 
     @Scripts.Render("~/bundles/jquery")
 
-    <!--Подкючаем бандл к шаблону админ зоны-->
+    <!--Connect the bundle to the admin zone-->
     @Scripts.Render("~/bundles/jquery-ui")
     @Scripts.Render("~/bundles/ckeditor")
 
