@@ -78,7 +78,7 @@ namespace Store.Controllers
             // Initializing the model with data
             using (Db db = new Db())
             {
-                SidebarDTO dto = db.Sidebars.Find(1); //harcode
+                SidebarDTO dto = db.Sidebars.Find(1); // Todo: remove when testing is done
 
                 model = new SidebarVM(dto);
             }

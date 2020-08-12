@@ -20,22 +20,20 @@ namespace Store
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
 
-        // Создаем метод обработки запросов аутентификации
+        // Create a method for handling authentication requests
         protected void Application_AuthenticateRequest()
         {
-            // Провкряем, авторизован ли пользователь
+            // Check if the user is authorized
             if (User == null)
                 return;
 
-            // Получаем имя пользователя
             string userName = Context.User.Identity.Name;
 
-            // Обьявляем массив ролей
             string[] roles = null;
 
             using (Db db = new Db())
             {
-                // Заполняем массив ролями
+                // Filling the array with roles
                 UserDTO dto = db.Users.FirstOrDefault(x => x.Username == userName);
 
                 if (dto == null)
@@ -45,11 +43,11 @@ namespace Store
                     .Select(x => x.Role.Name).ToArray();
             }
 
-            // Создаем обьект интерфейса IPrincipal
+            // Create the IPrincipal interface object
             IIdentity userIdentity = new GenericIdentity(userName);
             IPrincipal newUserObject = new GenericPrincipal(userIdentity, roles);
 
-            // Обьявляем и инициализируем данными Context.User
+            // Declare and initialize with data Context.User
             Context.User = newUserObject;
 
 

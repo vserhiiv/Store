@@ -249,7 +249,7 @@ namespace Store.Areas.Admin.Controllers
             using (Db db = new Db())
             {
                 // Getting data from DTO
-                SidebarDTO dto = db.Sidebars.Find(1); //hardcode
+                SidebarDTO dto = db.Sidebars.Find(1); // Todo: remove when testing is done
 
                 // Filling the model with data
                 model = new SidebarVM(dto);
@@ -265,7 +265,7 @@ namespace Store.Areas.Admin.Controllers
             using (Db db = new Db())
             {
                 // Getting data from DTO
-                // SidebarDTO dto = db.Sidebars.Find(1); //Test
+                // SidebarDTO dto = db.Sidebars.Find(1); // Todo: remove when testing is done
                 SidebarDTO dto = db.Sidebars.FirstOrDefault(x => x.Id == model.Id);
 
                 dto.Body = model.Body;
